@@ -30,20 +30,22 @@ rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 # update system, install needed programs
 yum update -y
-yum install -y vim ntp wget openssh-clients openssl-devel zlib-devel \
-    gcc gcc-c++ make autoconf readline-devel curl-devel expat-devel \ 
-    gettext-devel 
+yum install vim ntp
+
+#wget openssh-clients openssl-devel zlib-devel \
+#    gcc gcc-c++ make autoconf readline-devel curl-devel expat-devel \ 
+#    gettext-devel 
 
 # get newest ruby/libyaml
-wget http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
-tar xzvf yaml-0.1.4.tar.gz; cd yaml-0.1.4
-./configure --prefix=/usr/local
-make; make install
+# wget http://pyyaml.org/download/libyaml/yaml-0.1.4.tar.gz
+# tar xzvf yaml-0.1.4.tar.gz; cd yaml-0.1.4
+# ./configure --prefix=/usr/local
+# make; make install
 
-wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p0.tar.gz
-tar xzvf ruby-1.9.3-p0.tar.gz; cd ruby-1.9.3-p0
-./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib
-make; make install
+# wget http://ftp.ruby-lang.org/pub/ruby/1.9/ruby-1.9.3-p0.tar.gz
+# tar xzvf ruby-1.9.3-p0.tar.gz; cd ruby-1.9.3-p0
+# ./configure --prefix=/usr/local --enable-shared --disable-install-doc --with-opt-dir=/usr/local/lib
+# make; make install
 
 ruby -v; gem --version
 
@@ -54,9 +56,49 @@ ntpdate pool.ntp.org
 sleep 10; reboot
  
 # install puppet programs
-yum install -y puppet-server puppetdb-terminus puppetdb puppet-dashboard mysql mysql-server
+yum install -y puppet puppet-server puppetdb-terminus puppetdb puppet-dashboard mysql mysql-server \
+ rubygem-passenger rubygem-passenger-native rubygem-passenger-native-libs mod_passenger
  
 # configure puppet
+cat << EOF >> /etc/httpd/conf.d/puppetmaster.conf
+PassengerHighPerformance on
+PassengerMaxPoolSize 12
+PassengerPoolIdleTime 1500
+PassengerMaxRequests 1000
+PassengerStatThrottleRate 120
+RackAutoDetect Off
+RailsAutoDetect Off
+
+Listen 8140
+
+<VirtualHost *:8140>
+        SSLEngine on
+        SSLProtocol -ALL +SSLv3 +TLSv1
+        SSLCipherSuite ALL:!ADH:RC4+RSA:+HIGH:+MEDIUM:-LOW:-SSLv2:-EXP
+        SSLCertificateFile      /var/lib/puppet/ssl/certs/${HOSTNA<E}.pem
+        SSLCertificateKeyFile   /var/lib/puppet/ssl/private_keys/${HOSTNAME}.pem
+        SSLCertificateChainFile /var/lib/puppet/ssl/ca/ca_crt.pem
+        SSLCACertificateFile    /var/lib/puppet/ssl/ca/ca_crt.pem
+        SSLVerifyClient optional
+        SSLVerifyDepth  1
+        SSLOptions +StdEnvVars
+
+        RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+        RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+
+        DocumentRoot /etc/puppet/rack/public/
+        RackBaseURI /
+        RailsEnv production
+        <Directory /etc/puppet/rack/>
+                Options None
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+</VirtualHost>
+EOF
+
 echo "*" > /etc/puppet/autosign.conf
  
 cat << EOF > /etc/puppet/puppetdb.conf
@@ -115,6 +157,10 @@ password: somepassword
 encoding: utf8
 adapter: mysql
 EOF
+
+yum install mod_ssl
+
+service httpd start
 
 cd /usr/share/puppet-dashboard
 rake RAILS_ENV=development db:migrate
