@@ -21,16 +21,11 @@ sleep 10
 # install puppet, client and dashboard
 yum install -y puppet-server puppet
  
-# start, create cert
-service puppetmaster start
-puppet cert --generate ${HOSTNAME}
- 
 # config the puppetmaster
 echo "PUPPET_SERVER=${HOSTNAME}" > /etc/sysconfig/puppet
 echo "PUPPET_LOG=/var/log/puppet/puppet.log" >> /etc/sysconfig/puppet
 echo "PUPPET_EXTRA_OPTS=--waitforcert=500" >> /etc/sysconfig/puppet
  
-# start, clear cache, create client cert
-rm -f /var/lib/puppet/ssl/certs/localhost.localdomain.pem
-service puppet start
-puppet agent --waitforcert 60 --test --debug
+# start, create cert
+service puppetmaster start
+puppet cert --generate ${HOSTNAME}
