@@ -24,7 +24,7 @@ yum install -y puppet-server
 # config the puppetmaster
 echo "PUPPET_SERVER=${HOSTNAME}" > /etc/sysconfig/puppet
 echo "PUPPET_LOG=/var/log/puppet/puppet.log" >> /etc/sysconfig/puppet
-echo "PUPPET_EXTRA_OPTS=--waitforcert=500" >> /etc/sysconfig/puppet
+echo "PUPPET_EXTRA_OPTS=--waitforcert=60" >> /etc/sysconfig/puppet
  
 # start, create cert
 service puppetmaster start
