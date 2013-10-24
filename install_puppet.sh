@@ -19,7 +19,7 @@ ntpdate pool.ntp.org
 sleep 10
  
 # install puppet, client and dashboard
-yum install -y puppet-server puppet
+yum install -y puppet-server
  
 # config the puppetmaster
 echo "PUPPET_SERVER=${HOSTNAME}" > /etc/sysconfig/puppet
