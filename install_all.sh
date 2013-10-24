@@ -27,18 +27,24 @@ ntpdate pool.ntp.org
 ################# reboot!
 sleep 10; reboot
  
-yum -y install puppet-server puppet
+yum -y install puppet-server
 
 cat << EOF > /etc/puppet/puppet.conf
 [main]
 logdir = /var/log/puppet
 rundir = /var/run/puppet
-ssldir = $vardir/ssl
+ssldir = $rundir/ssl
 [agent]
-classfile = $vardir/classes.txt
-localconfig = $vardir/localconfig
+classfile = $rundir/classes.txt
+localconfig = $rundirr/localconfig
 [master]
 certname = ${HOSTNAME}
 autosign = true
-EOF 
+EOF
+
+echo "*" > /etc/puppet/autosign.conf
+echo "PUPPET_SERVER=${HOSTNAME}" > /etc/sysconfig/puppet
+
+service puppetmaster restart
+puppet cert --generate ${HOSTNAME}
 
