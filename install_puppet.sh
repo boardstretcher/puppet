@@ -75,9 +75,32 @@ path /etc/puppet/files
 allow *.${DOMAIN}
 EOF
 
-yum install -y puppet-dashboard mysql mysql-server
+yum install -y puppet-dashboard mysql mysql-server mysql-devel gcc make
 chkconfig mysqld on 
 service mysqld start
 mysql -u root -e "CREATE DATABASE dashboard";
-mysql -u root -e "GRANT ALL PRIVILEGES ON dashboard.* TO dashboard@localhost IDENTIFIED BY '${MYSQLPASSWORD}';"
+mysql -u root -e "GRANT ALL PRIVILEGES ON dashboard.* TO dashboard@localhost IDENTIFIED BY 'somepassword';"
+mysql -u root -e "CREATE DATABASE dashboard_dev";
+mysql -u root -e "GRANT ALL PRIVILEGES ON dashboard_dev.* TO dashboard_dev@localhost IDENTIFIED BY 'somepassword';"
+
+gem install mysql -- --with-mysql-include=/usr/bin/mysql --with-mysql-lib=/usr/lib/mysql
+
+cat << EOF > /usr/share/puppet-dashboard/config/database.yml
+production:
+database: dashboard
+username: dashboard
+password: somepassword
+encoding: utf8
+adapter: mysql
+development:
+database: dashboard_dev
+username: dashboard_dev
+password: somepassword
+encoding: utf8
+adapter: mysql
+EOF
+
+cd /usr/share/puppet-dashboard
+rake RAILS_ENV=development db:migrate
+rake RAILS_ENV=production db:migrate
 
