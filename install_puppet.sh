@@ -1,106 +1,92 @@
-# most importantly, make sure your hostname and domain is set and correct
+# this will install puppet-master correctly, from there it is possible to 
+# use manifests to install puppetdb, activemq and the rest.
+
 # /etc/sysconfig/network
 # /etc/hosts
-echo "hostname: ${HOSTNAME}"
-echo "mysqlpassword: ${MYSQLPASSWORD}"
-echo "if empty, you want to set it in network/hosts and reboot"
- 
+echo "FQDN hostname of server: "; read HOSTNAME
+echo "Just the domain now: "; read DOMAIN
+echo "a general mysqlpassword: "; read MYSQLPASSWORD
+
+# disable some things, add some better options
+echo "" >> /etc/sysctl.conf
+echo "# Disable IPV6" >> /etc/sysctl.conf
+echo "net.ipv6.conf.all.disable_ipv6 = 1" >> /etc/sysctl.conf
+echo "net.ipv6.conf.default.disable_ipv6 = 1" >> /etc/sysctl.conf
+chkconfig ip6tables off
+chkconfig iptables off
+sed -i 's/\=enforcing/\=disabled/g' /etc/selinux/config
+sed -i 's/DIR\ 01\;34/DIR\ 40\;33/g' /etc/DIR_COLORS
+echo "export HISTTIMEFORMAT=\"[%h/%d .. %H:%M:%S] - \"" >> /etc/bashrc
+echo "export GREP_OPTIONS='--color=auto'" >> /etc/bashrc
+echo "export GREP_COLOR='1;32'" >> /etc/bashrc
+
+# fix time
+ntpdate pool.ntp.org
+
 # most current version (12-Apr-2013)
 rpm -ivh https://yum.puppetlabs.com/el/6.4/products/x86_64/puppetlabs-release-6-7.noarch.rpm
 rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
+
+################# reboot!
+echo "Press enter to reboot, or CTRL-C to abort installation: "; read; reboot
  
 # update system, install needed programs
 yum update -y
-yum install -y vim ntp
- 
-# fix time
-ntpdate pool.ntp.org
- 
-################# reboot!
-sleep 10
- 
-# install puppet, client and dashboard
-yum install -y puppet-server puppetdb-terminus puppetdb
- 
-# config the puppetmaster
-echo "PUPPET_SERVER=${HOSTNAME}" > /etc/sysconfig/puppet
-echo "PUPPET_LOG=/var/log/puppet/puppet.log" >> /etc/sysconfig/puppet
-echo "PUPPET_EXTRA_OPTS=--waitforcert=60" >> /etc/sysconfig/puppet
-echo "*" > /etc/puppet/autosign.conf
+yum install -y vim ntp puppet-server
 
-# puppet db config
-cat << EOF > /etc/puppet/puppetdb.conf
-[main]
-server = ${HOSTNAME}
-port = 8081
-EOF
-
-cat << EOF > /etc/puppet/routes.yaml 
----
-master:
-facts:
-terminus: puppetdb
-cache: yaml
-EOF
-
+# configure puppet master
 cat << EOF > /etc/puppet/puppet.conf
 [main]
-logdir = /var/log/puppet
-rundir = /var/run/puppet
-ssldir = /etc/puppet/ssl
+    logdir = /var/log/puppet
+    rundir = /var/run/puppet
+    ssldir = $vardir/ssl
 [agent]
-classfile = /etc/puppet/classes.txt
-localconfig = /etc/puppet/localconfig
+    classfile = $vardir/classes.txt
+    localconfig = $vardir/localconfig
 [master]
-storeconfigs = true
-storeconfigs_backend = puppetdb
+    certname = ${HOSTNAME}
+    autosign = true
 EOF
 
-# start, create cert
-service puppetmaster restart
-puppet cert --generate ${HOSTNAME}
-/usr/sbin/puppetdb-ssl-setup
-service puppetdb restart
-service puppetmaster restart
-chkconfig puppetmaster on
-chkconfig puppetdb on
+# config the puppet client
+cat << EOF > /etc/sysconfig/puppet
+PUPPET_SERVER=${HOSTNAME}
+PUPPET_LOG=/var/log/puppet/puppet.log
+EOF
 
-mkdir /etc/puppet/files
-chown -R puppet.puppet /etc/puppet
+# configure fileserver, make test manifest
+mkdir -p /opt/puppet-fileserver
+mkdir -p /etc/puppet/manifests/classes
 
-# set up fileserver
+echo "nothing" > /opt/puppet-fileserver/nothing
+
 cat << EOF > /etc/puppet/fileserver.conf
 [files]
-path /etc/puppet/files
+path /opt/puppet-fileserver
 allow *.${DOMAIN}
 EOF
 
-yum install -y puppet-dashboard mysql mysql-server mysql-devel gcc make
-chkconfig mysqld on 
-service mysqld start
-mysql -u root -e "CREATE DATABASE dashboard";
-mysql -u root -e "GRANT ALL PRIVILEGES ON dashboard.* TO dashboard@localhost IDENTIFIED BY 'somepassword';"
-mysql -u root -e "CREATE DATABASE dashboard_dev";
-mysql -u root -e "GRANT ALL PRIVILEGES ON dashboard_dev.* TO dashboard_dev@localhost IDENTIFIED BY 'somepassword';"
-
-gem install mysql -- --with-mysql-include=/usr/bin/mysql --with-mysql-lib=/usr/lib/mysql
-
-cat << EOF > /usr/share/puppet-dashboard/config/database.yml
-production:
-database: dashboard
-username: dashboard
-password: somepassword
-encoding: utf8
-adapter: mysql
-development:
-database: dashboard_dev
-username: dashboard_dev
-password: somepassword
-encoding: utf8
-adapter: mysql
+cat << EOF > /etc/puppet/manifests/side.pp
+import "classes/*"
+node default {
+include test
+}
 EOF
 
-cd /usr/share/puppet-dashboard
-rake RAILS_ENV=development db:migrate
-rake RAILS_ENV=production db:migrate
+cat << EOF > /etc/puppet/manifests/classes/test.pp
+class test {
+file { "/tmp/nothing":
+owner => root,
+group => root,
+mode => 644,
+source => "puppet:///files/nothing"
+}
+}
+EOF
 
+# start, create cert for server
+puppet cert --generate ${HOSTNAME}
+service puppetmaster restart
+service puppet restart
+chkconfig puppetmaster on
+chkconfig puppet on
