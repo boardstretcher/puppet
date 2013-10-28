@@ -97,3 +97,6 @@ service puppetmaster restart
 service puppet restart
 chkconfig puppetmaster on
 chkconfig puppet on
+
+# test
+puppet agent --test --debug --server ${HOSTNAME}
