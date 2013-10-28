@@ -24,7 +24,7 @@ password: BHbdhbD938UIH222
 encoding: utf8
 adapter: mysql
 test:
-database: dashboard_test
+database: dashboardtest
 username: dashboard
 password:
 encoding: utf8
