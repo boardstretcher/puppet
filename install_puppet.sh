@@ -1,7 +1,6 @@
 # ONLY TESTED ON Centos 6.4 x86_64
 
 
-
 # this will install puppet-master correctly, from there it is possible to 
 # use manifests to install puppetdb, activemq and the rest.
 
@@ -64,7 +63,7 @@ EOF
 # configure fileserver, make test manifest
 mkdir -p /opt/puppet-fileserver
 mkdir -p /etc/puppet/manifests/classes
-
+mkdir -p /etc/puppet/manifests/nodes
 echo "nothing" > /opt/puppet-fileserver/nothing
 
 chown -R puppet.puppet /opt/puppet-fileserver
@@ -78,6 +77,11 @@ EOF
 cat << EOF > /etc/puppet/manifests/site.pp
 import "classes/*"
 node default {
+}
+EOF
+
+cat << EOF > /etc/puppet/manifests/nodes/puppetmaster.pp
+node '${HOSTNAME}' {
   include test
 }
 EOF
