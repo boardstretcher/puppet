@@ -1,4 +1,4 @@
-puppet 3 installation
+puppet 3.3.1 installation
 ======
 
 THESE SCRIPTS WORK!!
