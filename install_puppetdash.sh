@@ -18,7 +18,6 @@ mysql -e "grant all on puppetdashdev.* to 'puppetdashdev'@'%' identified by 'pup
 mysql -e "grant all on puppetdashtest.* to 'puppetdashtest'@'%' identified by 'puppetdashtest';"
  
 # puppetdash config
-# THOSE TWO SPACES BEFORE EACH LINE MATTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 cat << EOF > /usr/share/puppet-dashboard/config/database.yml
 production:
   database: puppetdashprod
@@ -41,6 +40,10 @@ test:
   encoding: utf8
   adapter: mysql
 EOF
+echo "THOSE TWO SPACES BEFORE EACH LINE MATTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "So be sure to make sure that each line (not production, development, or test) have two spaces"
+echo "before it... I will open up VIM for you to do so. Press enter to open VIM."; read
+vim /usr/share/puppet-dashboard/config/database.yml
  
 # final setup
 cd /usr/share/puppet-dashboard
@@ -52,5 +55,5 @@ service puppet-dashboard start
 service puppet-dashboard-workers start
 
 # tests
-puppet agent --test --debug --server ${HOSTNAME}
-curl -D - ${HOSTNAME}:3000
+puppet agent --test --debug --server ${FQDN}
+curl -D - ${FQDN}:3000
