@@ -1,3 +1,7 @@
+# ONLY TESTED ON Centos 6.4 x86_64
+
+
+
 # this will install puppet-master correctly, from there it is possible to 
 # use manifests to install puppetdb, activemq and the rest.
 
