@@ -67,26 +67,28 @@ mkdir -p /etc/puppet/manifests/classes
 
 echo "nothing" > /opt/puppet-fileserver/nothing
 
+chown -R puppet.puppet /opt/puppet-fileserver
+
 cat << EOF > /etc/puppet/fileserver.conf
 [files]
 path /opt/puppet-fileserver
-allow *.${DOMAIN}
+allow *
 EOF
 
 cat << EOF > /etc/puppet/manifests/site.pp
 import "classes/*"
 node default {
-include test
+  include test
 }
 EOF
 
 cat << EOF > /etc/puppet/manifests/classes/test.pp
 class test {
-file { "/tmp/nothing":
-owner => root,
-group => root,
-mode => 644,
-source => "puppet:///files/nothing"
+ file { "/tmp/nothing":
+ owner => root,
+ group => root,
+ mode => 644,
+ source => "puppet://${HOSTNAME}/files/nothing"
 }
 }
 EOF
