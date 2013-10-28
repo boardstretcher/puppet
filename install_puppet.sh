@@ -33,8 +33,9 @@ rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
 echo "Press enter to reboot, or CTRL-C to abort installation: "; read; reboot
 
 # some variables to fill
-echo "FQDN hostname of server: "; read HOSTNAME
-echo "Just the domain now: "; read DOMAIN
+echo "JUST hostname of server: "; read HOSTNAME
+echo "JUST the domain now: "; read DOMAIN
+echo "Now the WHOLE FQDN: "; read FQDN
 echo "a general mysqlpassword: "; read MYSQLPASSWORD
 
 # install puppet
@@ -50,13 +51,13 @@ cat << EOF > /etc/puppet/puppet.conf
     classfile = $vardir/classes.txt
     localconfig = $vardir/localconfig
 [master]
-    certname = ${HOSTNAME}
+    certname = ${FQDN}
     autosign = true
 EOF
 
 # config the puppet client
 cat << EOF > /etc/sysconfig/puppet
-PUPPET_SERVER=${HOSTNAME}
+PUPPET_SERVER=${FQDN}
 PUPPET_LOG=/var/log/puppet/puppet.log
 EOF
 
@@ -95,17 +96,17 @@ class test {
  owner => root,
  group => root,
  mode => 644,
- source => "puppet://${HOSTNAME}/files/nothing"
+ source => "puppet://${FQDN}/files/nothing"
 }
 }
 EOF
 
 # start, create cert for server
-puppet cert --generate ${HOSTNAME}
+puppet cert --generate ${FQDN}
 service puppetmaster restart
 service puppet restart
 chkconfig puppetmaster on
 chkconfig puppet on
 
 # test
-puppet agent --test --debug --server ${HOSTNAME}
+puppet agent --test --debug --server ${FQDN}
