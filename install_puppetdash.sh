@@ -1,4 +1,5 @@
-# make sure that you have installed puppet already.
+# make sure that you have installed puppet already, using:
+# https://github.com/boardstretcher/puppet/blob/master/install_puppet.sh
 
 # mysql setup
 yum install -y mysql-server puppet-dashboard
@@ -6,39 +7,50 @@ service mysqld start
 chkconfig mysqld on
 mysql_secure_installation
  
-mysql -e "create database puppetdash"
-mysql -e "grant all on puppetdash.* to puppetdash@localhost identified by 'BHbdhbD938UIH222';"
+mysql -e "create database puppetdashprod"
+mysql -e "create database puppetdashdev"
+mysql -e "create database puppetdashtest"
+mysql -e "grant all on puppetdashprod.* to 'puppetdashprod'@'localhost' identified by 'puppetdashprod';"
+mysql -e "grant all on puppetdashdev.* to 'puppetdashdev'@'localhost' identified by 'puppetdashdev';"
+mysql -e "grant all on puppetdashtest.* to 'puppetdashtest'@'localhost' identified by 'puppetdashtest';"
+mysql -e "grant all on puppetdashprod.* to 'puppetdashprod'@'%' identified by 'puppetdashprod';"
+mysql -e "grant all on puppetdashdev.* to 'puppetdashdev'@'%' identified by 'puppetdashdev';"
+mysql -e "grant all on puppetdashtest.* to 'puppetdashtest'@'%' identified by 'puppetdashtest';"
  
 # puppetdash config
+# THOSE TWO SPACES BEFORE EACH LINE MATTER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 cat << EOF > /usr/share/puppet-dashboard/config/database.yml
 production:
-database: puppetdash
-username: puppetdash
-password: BHbdhbD938UIH222
-encoding: utf8
-adapter: mysql
+  database: puppetdashprod
+  username: puppetdashprod
+  password: puppetdashprod
+  encoding: utf8
+  adapter: mysql
+
 development:
-database: puppetdash
-username: puppetdash
-password: BHbdhbD938UIH222
-encoding: utf8
-adapter: mysql
+  database: puppetdashdev
+  username: puppetdashdev
+  password: puppetdashdev
+  encoding: utf8
+  adapter: mysql
+
 test:
-database: dashboardtest
-username: dashboard
-password:
-encoding: utf8
-adapter: mysql
+  database: dashboardtest
+  username: dashboardtest
+  password: dashboardtest
+  encoding: utf8
+  adapter: mysql
 EOF
  
 # final setup
 cd /usr/share/puppet-dashboard
-rake RAILS_ENV=production db:migrate
-/etc/init.d/puppet-dashboard start
- 
+rake gems:refresh_specs
+rake db:migrate RAILS_ENV=production
+
 # workers
-sudo -u puppet-dashboard env RAILS_ENV=production script/delayed_job -p dashboard -n 4 -m start
- 
+service puppet-dashboard start
+service puppet-dashboard-workers start
+
 # tests
-puppet agent --test
+puppet agent --test --debug --server ${HOSTNAME}
 curl -D - ${HOSTNAME}:3000
