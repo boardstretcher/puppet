@@ -73,7 +73,7 @@ path /opt/puppet-fileserver
 allow *.${DOMAIN}
 EOF
 
-cat << EOF > /etc/puppet/manifests/side.pp
+cat << EOF > /etc/puppet/manifests/site.pp
 import "classes/*"
 node default {
 include test
