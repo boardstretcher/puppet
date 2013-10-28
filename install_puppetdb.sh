@@ -3,19 +3,15 @@
 
 # this will install puppetdb using the puppet module
 
-# lets make sure that the hostname is all good
-facter | grep host
-
-echo "That hostname should be a FQDN, if it is not, then exit this installation";
-echo "and set your /etc/hosts, /etc/sysconfig/network files to have the FQDN and reboot";
-echo ""
-echo "Press enter to coninute or CTLR-C to quit and make changes"; read
+# clear yum cache
+yum clean all
 
 # install the module
 puppet module install puppetlabs/puppetdb
 
 # use puppet to install puppetdb
-puppet resource package puppetdb ensure=latest
+puppet resource package puppetdb ensure=latest --server ${HOSTNAME}
+
 
 # start and enable the service
 puppet resource service puppetdb ensure=running enable=true
