@@ -20,6 +20,11 @@ echo "export HISTTIMEFORMAT=\"[%h/%d .. %H:%M:%S] - \"" >> /etc/bashrc
 echo "export GREP_OPTIONS='--color=auto'" >> /etc/bashrc
 echo "export GREP_COLOR='1;32'" >> /etc/bashrc
 
+# update system, install needed programs
+yum update -y
+yum install -y vim ntp 
+yum install -y gcc gcc-c++ curl-devel openssl-devel  zlib-devel ruby-devel  httpd-devel apr-devel apr-util-devel
+
 # fix time
 ntpdate pool.ntp.org
 
@@ -29,11 +34,10 @@ rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 ################# reboot!
 echo "Press enter to reboot, or CTRL-C to abort installation: "; read; reboot
- 
-# update system, install needed programs
-yum update -y
-yum install -y vim ntp puppet-server
 
+# install puppet
+yum install -y puppet-server
+ 
 # configure puppet master
 cat << EOF > /etc/puppet/puppet.conf
 [main]
