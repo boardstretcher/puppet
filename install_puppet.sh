@@ -1,12 +1,6 @@
 # this will install puppet-master correctly, from there it is possible to 
 # use manifests to install puppetdb, activemq and the rest.
 
-# /etc/sysconfig/network
-# /etc/hosts
-echo "FQDN hostname of server: "; read HOSTNAME
-echo "Just the domain now: "; read DOMAIN
-echo "a general mysqlpassword: "; read MYSQLPASSWORD
-
 # disable some things, add some better options
 echo "" >> /etc/sysctl.conf
 echo "# Disable IPV6" >> /etc/sysctl.conf
@@ -34,6 +28,11 @@ rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 ################# reboot!
 echo "Press enter to reboot, or CTRL-C to abort installation: "; read; reboot
+
+# some variables to fill
+echo "FQDN hostname of server: "; read HOSTNAME
+echo "Just the domain now: "; read DOMAIN
+echo "a general mysqlpassword: "; read MYSQLPASSWORD
 
 # install puppet
 yum install -y puppet-server
