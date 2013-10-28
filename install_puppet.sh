@@ -74,18 +74,21 @@ path /opt/puppet-fileserver
 allow *
 EOF
 
+# configure default manifest
 cat << EOF > /etc/puppet/manifests/site.pp
 import "classes/*"
 node default {
 }
 EOF
 
+# configure puppetmaster manifest
 cat << EOF > /etc/puppet/manifests/nodes/puppetmaster.pp
 node '${HOSTNAME}' {
   include test
 }
 EOF
 
+# create fileserver test manifest
 cat << EOF > /etc/puppet/manifests/classes/test.pp
 class test {
  file { "/tmp/nothing":
