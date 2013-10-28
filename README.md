@@ -19,3 +19,4 @@ install_puppet.sh will install the basic puppet master, client and puppet filese
 
 install_dashboard.sh will install a basic puppet dashboard running on webrick @ port 3000
 
+install_puppetdb.sh will install the puppetdb and configure it for use by dashboard and puppet master
