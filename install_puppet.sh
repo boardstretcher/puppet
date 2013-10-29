@@ -68,11 +68,13 @@ class test {
 EOF
 
 # start, create cert for server
-puppet cert --generate ${FQDN}
 service puppetmaster restart
 service puppet restart
 chkconfig puppetmaster on
 chkconfig puppet on
+puppet cert --generate ${FQDN}
+puppet cert clean ${HOSTNAME}
+rm -f /ssl/certs/${HOSTNAME}.pem
 
 # test
 puppet agent --test --debug --server ${FQDN}
