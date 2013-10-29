@@ -35,3 +35,4 @@ installation on Centos 6.4 x86_64
 - install_puppetdb.sh         - install the puppetdb and configure it for use by dashboard and puppet master
 - install_puppet_activemq.sh  - install activemq for use with mcollective
 - install_mco.sh              - install mcollective
+- install_passenger.sh        - install passenger and disable webrick
