@@ -2,3 +2,4 @@
 
 puppet module install puppetlabs/activemq
 
+# that was easy!
