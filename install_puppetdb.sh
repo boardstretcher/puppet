@@ -28,9 +28,13 @@ cat << EOF > /etc/puppet/puppetdb.conf
 server = ${FQDN}
 port = 8081
 EOF
+
 echo "storeconfigs = true" >> /etc/puppet/puppet.conf
 echo "storeconfigs_backend = puppetdb" >> /etc/puppet/puppet.conf
-echo "reports = store,puppetdb" >> /etc/puppet/puppet.conf
+echo "reports = store,puppetdb,http" >> /etc/puppet/puppet.conf
+echo "reporturl = http://${FQDN}:3000/reports/upload" >> /etc/puppet/puppet.conf
+echo "node_terminus = exec" >> /etc/puppet/puppet.conf
+echo "external_nodes = /usr/bin/env PUPPET_DASHBOARD_URL=http://${FQDN}:3000 /opt/puppet-dashboard/bin/external_node" >> /etc/puppet/puppet.conf
 
 cat << EOF > /etc/puppet/routes.yaml
 ---
