@@ -18,7 +18,7 @@ echo "export GREP_COLOR='1;32'" >> /etc/bashrc
 
 # update system, install needed programs
 yum update -y
-yum install -y vim ntp 
+yum install -y vim ntp wget
 yum install -y gcc gcc-c++ curl-devel openssl-devel  zlib-devel ruby-devel  httpd-devel apr-devel apr-util-devel
 
 # fix time
