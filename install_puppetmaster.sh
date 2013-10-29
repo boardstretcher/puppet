@@ -49,7 +49,7 @@ node default {
 EOF
 
 # configure puppetmaster manifest
-cat << EOF > /etc/puppet/manifests/nodes/puppetmaster.pp
+cat << EOF > /etc/puppet/manifests/nodes/${HOSTNAME}.pp
 node '${HOSTNAME}' {
   include test
 }
