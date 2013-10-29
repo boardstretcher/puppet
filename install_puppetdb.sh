@@ -10,7 +10,7 @@ yum clean all
 puppet module install puppetlabs/puppetdb
 
 # use puppet to install puppetdb
-puppet resource package puppetdb ensure=latest --server ${HOSTNAME}
+puppet resource package puppetdb ensure=latest --server ${FQDN}
 
 # install sun java (might have to refuckulate this URL)
 cd /root/
@@ -18,7 +18,6 @@ wget http://javadl.sun.com/webapps/download/AutoDL?BundleId=81811
 mv jre* jre-7u45-linux-x64.rpm
 rpm -Uvh jre-7u45-linux-x64.rpm
 alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000
-alternatives --install /usr/bin/javaws javaws /usr/java/latest/bin/javaws 200000
 
 # config puppetdb
 cat << EOF > /etc/puppet/puppetdb.conf
