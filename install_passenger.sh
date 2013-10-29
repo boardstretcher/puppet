@@ -24,7 +24,26 @@ PassengerPoolIdleTime 600
 
 Listen 8140
 <VirtualHost *:8140>
-    RackAutoDetect On
+SSLEngine On
+
+    # Only allow high security cryptography. Alter if needed for compatibility.
+    SSLProtocol             All -SSLv2
+    SSLCipherSuite          HIGH:!ADH:RC4+RSA:-MEDIUM:-LOW:-EXP
+    SSLCertificateFile      /ssl/certs/${FQDN}.pem
+    SSLCertificateKeyFile   /ssl/private_keys/${FQDN}.pem
+    SSLCertificateChainFile /ssl/ca/ca_crt.pem
+    SSLCACertificateFile    /ssl/ca/ca_crt.pem
+    SSLCARevocationFile     /ssl/ca/ca_crl.pem
+    SSLVerifyClient         optional
+    SSLVerifyDepth          1
+    SSLOptions              +StdEnvVars +ExportCertData
+
+    # These request headers are used to pass the client certificate
+    # authentication information on to the puppet master process
+    RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+    RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+    RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+
     DocumentRoot /usr/share/puppet/rack/puppetmasterd/public/
     <Directory /usr/share/puppet/rack/puppetmasterd/>
         Options None
@@ -41,8 +60,8 @@ echo "ServerName ${FQDN}" >> /etc/httpd/conf/httpd.conf
 service puppetmaster stop
 chkconfig puppetmaster off
 
-# start apache puppetmaster server
-service httpd restart
-
 # turn off autosigning
 sed -i 's/autosign\ \=\ true/autosign\ \=\ false/g' /etc/puppet/puppet.conf
+
+# start apache puppetmaster server
+service httpd restart
