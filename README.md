@@ -12,6 +12,12 @@ are the scripts you need.
 
 You are welcome.
 
+If you have any improvements, be sure to fork/pull the changes up! I'm always looking for improvement.
+
+Coming soon
+======
+A few people mentioned that they want "external node classifiers" enabled, Ill work that in this week.
+
 PRE-SETUP REQUIREMENTS
 ======
 
