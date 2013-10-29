@@ -45,3 +45,7 @@ yum -y install puppetdb-terminus
 
 # start and enable the service
 puppet resource service puppetdb ensure=running enable=true
+
+# restart
+service puppetmaster restart
+service puppetdb restart
