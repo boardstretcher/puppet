@@ -1,3 +1,12 @@
+# test for prep file
+if [ ! -f "/tmp/prep_done" ]; then 
+ echo "Read the directions! You should run the scripts in order..." 
+ echo "so run 'prepare.sh' first,.. for real, this installation is complicated enough" 
+ echo "without you ignoring the directions."
+ 
+ echo "https://github.com/boardstretcher/puppet/blob/master/README.md"
+fi
+
 # some variables to fill
 echo "JUST hostname of server: "; read HOSTNAME
 echo "JUST the domain now: "; read DOMAIN
