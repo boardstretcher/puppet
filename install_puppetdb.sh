@@ -19,6 +19,9 @@ mv jre* jre-7u45-linux-x64.rpm
 rpm -Uvh jre-7u45-linux-x64.rpm
 alternatives --install /usr/bin/java java /usr/java/latest/bin/java 200000
 
+# this should work
+java -version
+
 # config puppetdb
 cat << EOF > /etc/puppet/puppetdb.conf
 [main]
@@ -42,11 +45,3 @@ yum -y install puppetdb-terminus
 
 # start and enable the service
 puppet resource service puppetdb ensure=running enable=true
-
-# check for errors
-tail /var/log/puppetdb/puppetdb.log
-
-# edit 
-# puppetdb.conf
-# puppet.conf
-# routes.yaml
