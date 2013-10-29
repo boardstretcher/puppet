@@ -2,6 +2,8 @@
 
 
 # prepare server for puppet installation
+echo "what is your domain name? "; read DOMAIN
+
 
 # disable some things, add some better options
 echo "" >> /etc/sysctl.conf
@@ -15,6 +17,7 @@ sed -i 's/DIR\ 01\;34/DIR\ 40\;33/g' /etc/DIR_COLORS
 echo "export HISTTIMEFORMAT=\"[%h/%d .. %H:%M:%S] - \"" >> /etc/bashrc
 echo "export GREP_OPTIONS='--color=auto'" >> /etc/bashrc
 echo "export GREP_COLOR='1;32'" >> /etc/bashrc
+echo "domain ${DOMAIN}" >> /etc/resolv.conf
 
 # update system, install needed programs
 yum update -y
