@@ -29,4 +29,5 @@ rpm -ivh https://yum.puppetlabs.com/el/6.4/products/x86_64/puppetlabs-release-6-
 rpm -ivh http://mirrors.mit.edu/epel/6/x86_64/epel-release-6-8.noarch.rpm
 
 ################# reboot!
+touch /tmp/prep_done
 echo "Press enter to reboot, or CTRL-C to abort installation: "; read; reboot
