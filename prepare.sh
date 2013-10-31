@@ -1,9 +1,7 @@
 # ONLY TESTED ON Centos 6.4 x86_64
 
 
-
-# Warning - I disable SELINUX and IPTABLES
-
+# Warning - I disable SELINUX and IPTABLES and install GCC
 
 
 # prepare server for puppet installation
