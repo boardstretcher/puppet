@@ -1,6 +1,11 @@
 # ONLY TESTED ON Centos 6.4 x86_64
 
 
+
+# Warning - I disable SELINUX and IPTABLES
+
+
+
 # prepare server for puppet installation
 echo "what is your domain name? "; read DOMAIN
 
