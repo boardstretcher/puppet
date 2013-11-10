@@ -1,14 +1,23 @@
 puppet 3.3.1 installation
 ======
 
-THESE SCRIPTS WORK!!
+NOTE:
+
+(I sacrifice security for automation, so on a production system be sure to re-enable iptables, selinux, 
+and change your passwords. This is more of a proof-of-concept to get puppet up and running correctly. Once you see
+that its possible and how it is done, it is much easier to have security enabled and go through the process
+on your own, or tailor the scripts to suit your needs.)
+
+ANYWAY:
+
+These scripts actually work!
 
 Tested on Centos 6.4 x86_64 - October 28, 2013
 
 I made them because the documentation of installation process for Puppet Community is frankly fucking laughable. 
 And worse yet, its a RUBY program, so the debugging process is deplorable. So If you are ready to tear your hair 
 out because you need an actual working install, which is asking for a lot from Community Puppet, then these 
-are the scripts you need.
+are the scripts you need to start with.
 
 You are welcome.
 
