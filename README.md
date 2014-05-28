@@ -25,10 +25,6 @@ are the scripts you need to start with.
 
 You are welcome.
 
-Coming soon
-======
-A few people mentioned that they want "external node classifiers" enabled, Ill work that in this week.
-
 PRE-SETUP REQUIREMENTS
 ======
 
